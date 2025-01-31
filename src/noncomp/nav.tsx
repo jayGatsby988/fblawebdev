@@ -41,19 +41,20 @@ export default function Navbar() {
       onKeyDown={toggleDrawer(false)}
     >
       <List>
-        {(user ? ["Grades", "GPA", "Help", "Logout"] : ["Help", "Login"]).map(
-          (text, index) => (
-            <ListItem
-              button
-              key={text}
-              onClick={text === "Logout" ? logOut : null}
-              component={Link}
-              href={text === "Logout" ? "/" : `/${text.toLowerCase()}`}
-            >
-              <ListItemText primary={text} />
-            </ListItem>
-          )
-        )}
+        {(user
+          ? ["Submit", "AdminPanel", "Listings", "Logout"]
+          : ["Login"]
+        ).map((text, index) => (
+          <ListItem
+            button
+            key={text}
+            onClick={text === "Logout" ? logOut : null}
+            component={Link}
+            href={text === "Logout" ? "/" : `/${text.toLowerCase()}`}
+          >
+            <ListItemText primary={text} />
+          </ListItem>
+        ))}
       </List>
     </Box>
   );
@@ -106,18 +107,18 @@ export default function Navbar() {
                   <Button
                     color="inherit"
                     component={Link}
-                    href="/grades"
+                    href="/submit"
                     sx={{ margin: 1 }}
                   >
-                    Grades
+                    Submit
                   </Button>
                   <Button
                     color="inherit"
                     component={Link}
-                    href="/gpa"
+                    href="/adminpanel"
                     sx={{ margin: 1 }}
                   >
-                    GPA
+                    AdminPanel
                   </Button>
                 </>
               ) : (
@@ -126,10 +127,10 @@ export default function Navbar() {
               <Button
                 color="inherit"
                 component={Link}
-                href="/help"
+                href="/jobs"
                 sx={{ margin: 1 }}
               >
-                Help
+                Listings
               </Button>
               <Button
                 variant="contained"
@@ -137,7 +138,10 @@ export default function Navbar() {
                 component={Link}
                 href="/login"
                 onClick={logOut}
-                sx={{ margin: 1, backgroundColor: "#4E6766" }}
+                sx={{
+                  margin: 1,
+                  backgroundColor: "rgb(37,99,235)",
+                }}
               >
                 {user ? "Logout" : "Login"}
               </Button>

@@ -23,7 +23,11 @@ export default function LoginPage() {
   const { user } = useAuth();
 
   if (user) {
-    redirect("/" + search || "");
+    if (search) {
+      redirect("/" + search || "");
+    } else {
+      redirect("/");
+    }
   }
   // Handle input change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,7 +40,11 @@ export default function LoginPage() {
     setError(""); // Reset error
     try {
       await signInWithEmailAndPassword(auth, formData.email, formData.password);
-      router.push("/" + search); // Redirect after login
+      if (search) {
+        redirect("/" + search || "");
+      } else {
+        redirect("/");
+      }
     } catch (error: any) {
       setError(error.message);
     }
@@ -47,7 +55,7 @@ export default function LoginPage() {
     setError(""); // Reset error
     try {
       await signInWithPopup(auth, provider);
-      router.push("/" + search); // Redirect after login
+      redirect("/" + search || "");
     } catch (error: any) {
       setError(error.message);
     }
