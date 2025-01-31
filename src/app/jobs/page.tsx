@@ -5,6 +5,7 @@ import { FaBuilding, FaLocationArrow, FaMoneyBillWave, FaClock, FaMapMarkerAlt, 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Redirect } from "next";
 import { redirect } from "next/navigation";
+import { useAuth } from "../context/authcontext";
 
 const jobs = [
   {
@@ -160,6 +161,12 @@ const jobs = [
 ];
 
 export default function JobBoard() {
+    const { user, logOut } = useAuth();
+
+    if (!user) {
+      redirect("/login?redirect=jobs");
+    }
+
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState({
     location: "",
