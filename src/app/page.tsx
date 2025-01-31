@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "./context/authcontext";
-import Login from "./login/page";
+import Login from "./login2/page";
 // Fixed import path
 
 const jobListings = [
@@ -39,10 +39,7 @@ const jobListings = [
 ];
 
 export default function Home() {
-  const { user, logOut } = useAuth();
-  if (!user) {
-    return <Login />;
-  }
+
   return (
     <div className="h-screen w-screen snap-y snap-mandatory overflow-y-scroll bg-gradient-to-br from-gray-50 to-blue-50">
       {/* Hero Section */}
