@@ -135,6 +135,14 @@ export default function Navbar() {
             </>
           ) : (
             <>
+              <Button
+                color="inherit"
+                component={Link}
+                href="/help"
+                sx={{ margin: 1 }}
+              >
+                Help
+              </Button>
               {user ? (
                 <>
                   {/* Show these buttons only for employers and counselors */}
