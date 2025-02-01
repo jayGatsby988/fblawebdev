@@ -132,8 +132,7 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              {/* If userRole exists, show role-specific options */}
-              {userRole ? (
+              {user ? (
                 <>
                   {/* Show these buttons only for employers and counselors */}
                   {userRole === "Employer" || userRole === "Counselor" ? (
