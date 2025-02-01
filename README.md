@@ -1,11 +1,9 @@
 <h1>CareerConnect</h1>
 <h2>Overview</h2>
-<br/>
-<br/>
 <b>Career Connect</b> is an innovative website that provides an efficient job search experience by connecting students with employers. Built with Next.js and Firebase, it offers a seamless user experience with real-time data updates, secure authentication, and fast performance.
 
 <br/>
-Features
+<h2>Features</h2>
 Next.js for Frontend & API Routes – Fast, scalable, and optimized rendering.
 <br/>
 Firebase Firestore – Real-time database for storing and syncing user data.
