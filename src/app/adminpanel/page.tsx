@@ -1,12 +1,29 @@
-'use client';
+"use client";
 
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Filter, ChevronDown, ChevronUp, Home, BarChart } from "lucide-react";
+import {
+  Search,
+  Filter,
+  ChevronDown,
+  ChevronUp,
+  Home,
+  BarChart,
+} from "lucide-react";
 import { useDebounce } from "use-debounce";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Bar } from "recharts";
-
-
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  Bar,
+} from "recharts";
+import { collection, doc, getDocs, updateDoc } from "@firebase/firestore";
+import db from "../firebase/firestore";
 
 // Dummy implementations of custom UI components
 function Input(props: React.ComponentProps<"input">) {
@@ -18,7 +35,9 @@ function Input(props: React.ComponentProps<"input">) {
   );
 }
 
-function Button(props: React.ComponentProps<"button"> & { variant?: string; size?: string }) {
+function Button(
+  props: React.ComponentProps<"button"> & { variant?: string; size?: string }
+) {
   return (
     <button
       {...props}
@@ -37,7 +56,7 @@ function Button(props: React.ComponentProps<"button"> & { variant?: string; size
 function useToast() {
   return {
     toast: ({ title, description }: { title: string; description: string }) => {
-      console.log("approved")
+      console.log("approved");
     },
   };
 }
@@ -54,16 +73,30 @@ interface JobPosting {
 }
 
 // Create some dummy job postings
-const createJobPostings = () => {
-  return Array.from({ length: 50 }, (_, i) => ({
-    id: `posting-${i}`,
-    title: `Software Engineer ${i + 1}`,
-    company: `Tech Corp ${i + 1}`,
-    location: ["New York", "San Francisco", "Remote"][i % 3],
-    experience: `${i % 5}+ years`,
-    status: "pending",
-    postedOn: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000),
-  }));
+const fetchJobPostings = async () => {
+  try {
+    const querySnapshot = await getDocs(collection(db, "jobs"));
+    return querySnapshot.docs.map((doc) => {
+      const data = doc.data();
+      if (data.status != "pending") {
+        return;
+      }
+      console.log(data)
+      return {
+        id: doc?.id,
+        title: data?.title || "Untitled",
+        company: data?.company || "Unknown",
+        location: data?.location || "Remote",
+        experience: data?.experience || "0+ years",
+        status: data?.status || "pending",
+        postedOn:
+          data.postedOn?.toDate().toISOString() || new Date().toISOString(),
+      };
+    });
+  } catch (error) {
+    console.error("Error fetching job postings:", error);
+    return [];
+  }
 };
 
 export default function JobPostingPanel() {
@@ -85,41 +118,92 @@ export default function JobPostingPanel() {
 
   // Initialize job postings on the client side
   useEffect(() => {
-    setJobPostings(createJobPostings());
+    const loadJobPostings = async () => {
+      const postings = await fetchJobPostings();
+      setJobPostings(postings);
+      console.log(postings);
+    };
+
+    loadJobPostings();
   }, []);
 
   // Filter job postings by search term (name only) and filters
-  const filteredJobPostings = useMemo(() => {
-    const term = debouncedSearch.toLowerCase();
-    return jobPostings.filter(
+const filteredJobPostings = useMemo(() => {
+  const term = debouncedSearch.toLowerCase();
+  return jobPostings
+    .filter((posting) => posting && posting.title) // Ensure posting is defined
+    .filter(
       (posting) =>
         posting.title.toLowerCase().includes(term) &&
         (filters.location ? posting.location === filters.location : true) &&
-        (filters.experience ? posting.experience === filters.experience : true) 
-
+        (filters.experience ? posting.experience === filters.experience : true)
     );
-  }, [jobPostings, debouncedSearch, filters]);
+}, [jobPostings, debouncedSearch, filters]);
 
-  const handleApprove = useCallback((id: string) => {
-    setJobPostings((prev) => prev.filter((posting) => posting.id !== id));
-    toast({ title: "Approved", description: "Job posting has been approved and removed." });
-  }, [toast]);
 
-  const handleReject = useCallback((id: string) => {
-    setJobPostings((prev) => prev.filter((posting) => posting.id !== id));
-    toast({ title: "Rejected", description: "Job posting has been rejected and removed." });
-  }, [toast]);
+const handleApprove = useCallback(
+  async (id: string) => {
+    try {
+      const jobRef = doc(db, "jobs", id);
+      await updateDoc(jobRef, { status: "approved" });
 
+      setJobPostings((prev) => prev.filter((posting) => posting.id !== id));
+      toast({
+        title: "Approved",
+        description: "Job posting has been approved.",
+      });
+    } catch (error) {
+      console.error("Error approving job:", error);
+      toast({
+        title: "Error",
+        description: "Failed to approve the job.",
+      });
+    }
+  },
+  [toast]
+);
+
+ const handleReject = useCallback(
+   async (id: string) => {
+     try {
+       const jobRef = doc(db, "jobs", id);
+       await updateDoc(jobRef, { status: "rejected" });
+
+       setJobPostings((prev) => prev.filter((posting) => posting.id !== id));
+       toast({
+         title: "Rejected",
+         description: "Job posting has been rejected.",
+       });
+     } catch (error) {
+       console.error("Error rejecting job:", error);
+       toast({
+         title: "Error",
+         description: "Failed to reject the job.",
+       });
+     }
+   },
+   [toast]
+ );
   const handleFilterChange = (key: string, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
   // Analytics data
   const analyticsData = useMemo(() => {
-    const total = jobPostings.length;
-    const approved = jobPostings.filter((p) => p.status === "approved").length;
-    const rejected = jobPostings.filter((p) => p.status === "rejected").length;
-    const pending = jobPostings.filter((p) => p.status === "pending").length;
+    const safeJobPostings = jobPostings.filter(
+      (p) => p !== undefined && p !== null
+    );
+
+    const total = safeJobPostings.length;
+    const approved = safeJobPostings.filter(
+      (p) => p.status === "approved"
+    ).length;
+    const rejected = safeJobPostings.filter(
+      (p) => p.status === "rejected"
+    ).length;
+    const pending = safeJobPostings.filter(
+      (p) => p.status === "pending"
+    ).length;
 
     // Data for graphs
     const statusData = [
@@ -129,9 +213,19 @@ export default function JobPostingPanel() {
     ];
 
     const locationData = [
-      { name: "New York", value: jobPostings.filter((p) => p.location === "New York").length },
-      { name: "San Francisco", value: jobPostings.filter((p) => p.location === "San Francisco").length },
-      { name: "Remote", value: jobPostings.filter((p) => p.location === "Remote").length },
+      {
+        name: "New York",
+        value: safeJobPostings.filter((p) => p.location === "New York").length,
+      },
+      {
+        name: "San Francisco",
+        value: safeJobPostings.filter((p) => p.location === "San Francisco")
+          .length,
+      },
+      {
+        name: "Remote",
+        value: safeJobPostings.filter((p) => p.location === "Remote").length,
+      },
     ];
 
     return { total, approved, rejected, pending, statusData, locationData };
@@ -201,7 +295,11 @@ export default function JobPostingPanel() {
                 >
                   <Filter className="w-4 h-4" />
                   Filters
-                  {filtersOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  {filtersOpen ? (
+                    <ChevronUp className="w-4 h-4" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4" />
+                  )}
                 </Button>
               </div>
             )}
@@ -219,10 +317,14 @@ export default function JobPostingPanel() {
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Location</label>
+                      <label className="text-sm font-medium text-gray-700">
+                        Location
+                      </label>
                       <select
                         value={filters.location}
-                        onChange={(e) => handleFilterChange("location", e.target.value)}
+                        onChange={(e) =>
+                          handleFilterChange("location", e.target.value)
+                        }
                         className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
                         <option value="">All</option>
@@ -232,10 +334,14 @@ export default function JobPostingPanel() {
                       </select>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Experience</label>
+                      <label className="text-sm font-medium text-gray-700">
+                        Experience
+                      </label>
                       <select
                         value={filters.experience}
-                        onChange={(e) => handleFilterChange("experience", e.target.value)}
+                        onChange={(e) =>
+                          handleFilterChange("experience", e.target.value)
+                        }
                         className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
                         <option value="">All</option>
@@ -246,7 +352,6 @@ export default function JobPostingPanel() {
                         <option>5+ years</option>
                       </select>
                     </div>
-                  
                   </div>
                 </motion.div>
               )}
@@ -291,10 +396,18 @@ export default function JobPostingPanel() {
                         exit={{ opacity: 0 }}
                         className="hover:bg-gray-50"
                       >
-                        <td className="px-6 py-4 text-sm text-gray-900">{posting.title}</td>
-                        <td className="px-6 py-4 text-sm text-gray-900">{posting.company}</td>
-                        <td className="px-6 py-4 text-sm text-gray-900">{posting.location}</td>
-                        <td className="px-6 py-4 text-sm text-gray-900">{posting.experience}</td>
+                        <td className="px-6 py-4 text-sm text-gray-900">
+                          {posting.title}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-900">
+                          {posting.company}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-900">
+                          {posting.location}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-900">
+                          {posting.experience}
+                        </td>
                         <td className="px-6 py-4 text-sm text-gray-900">
                           <div className="flex gap-2">
                             <Button
@@ -320,13 +433,8 @@ export default function JobPostingPanel() {
               </div>
             </motion.div>
           )}
-
-     
-          
         </div>
       </div>
-      
     </div>
-    
   );
 }

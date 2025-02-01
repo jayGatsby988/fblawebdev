@@ -1,0 +1,104 @@
+{
+  "jobs": {
+    "job1": {
+      "title": "Software Engineer",
+      "company": "TechWave",
+      "description": "Develop and maintain web applications.",
+      "isRemote": false,
+      "location": "New York",
+      "salary": "$120,000/year",
+      "status": "approved",
+      "timePosted": "2025-02-01T05:01:27.199Z"
+    },
+    "job2": {
+      "title": "Product Manager",
+      "company": "InnoSoft",
+      "description": "Lead product development and strategy.",
+      "isRemote": true,
+      "location": "San Francisco",
+      "salary": "$135,000/year",
+      "status": "pending",
+      "timePosted": "2025-01-15T08:30:00.000Z"
+    },
+    "job3": {
+      "title": "Data Analyst",
+      "company": "TechWave",
+      "description": "Analyze business data for insights.",
+      "isRemote": false,
+      "location": "Remote",
+      "salary": "$90,000/year",
+      "status": "rejected",
+      "timePosted": "2024-12-20T12:15:45.500Z"
+    },
+    "job4": {
+      "title": "UX Designer",
+      "company": "Creative Minds",
+      "description": "Design user-friendly interfaces.",
+      "isRemote": false,
+      "location": "Los Angeles",
+      "salary": "$110,000/year",
+      "status": "approved",
+      "timePosted": "2025-02-01T10:45:30.300Z"
+    },
+    "job5": {
+      "title": "DevOps Engineer",
+      "company": "CloudSync",
+      "description": "Manage cloud infrastructure and CI/CD pipelines.",
+      "isRemote": true,
+      "location": "Austin",
+      "salary": "$125,000/year",
+      "status": "approved",
+      "timePosted": "2025-01-05T06:20:10.100Z"
+    },
+    "job6": {
+      "title": "Marketing Specialist",
+      "company": "BrandBoost",
+      "description": "Develop marketing strategies and campaigns.",
+      "isRemote": false,
+      "location": "Chicago",
+      "salary": "$85,000/year",
+      "status": "pending",
+      "timePosted": "2025-01-22T14:05:50.700Z"
+    },
+    "job7": {
+      "title": "Frontend Developer",
+      "company": "TechWave",
+      "description": "Build responsive web interfaces.",
+      "isRemote": false,
+      "location": "New York",
+      "salary": "$105,000/year",
+      "status": "approved",
+      "timePosted": "2025-01-30T09:45:15.900Z"
+    },
+    "job8": {
+      "title": "Cybersecurity Analyst",
+      "company": "SecureNet",
+      "description": "Protect systems from cyber threats.",
+      "isRemote": true,
+      "location": "Remote",
+      "salary": "$115,000/year",
+      "status": "rejected",
+      "timePosted": "2025-01-18T11:30:22.400Z"
+    },
+    "job9": {
+      "title": "AI Researcher",
+      "company": "InnoSoft",
+      "description": "Work on cutting-edge AI projects.",
+      "isRemote": false,
+      "location": "San Francisco",
+      "salary": "$150,000/year",
+      "status": "approved",
+      "timePosted": "2025-02-02T16:20:18.600Z"
+    },
+    "job10": {
+      "title": "HR Coordinator",
+      "company": "PeopleFirst",
+      "description": "Manage hiring and employee relations.",
+      "isRemote": false,
+      "location": "Dallas",
+      "salary": "$75,000/year",
+      "status": "pending",
+      "timePosted": "2025-01-27T13:55:40.800Z"
+    }
+  }
+}

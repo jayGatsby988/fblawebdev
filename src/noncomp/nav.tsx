@@ -41,20 +41,24 @@ export default function Navbar() {
       onKeyDown={toggleDrawer(false)}
     >
       <List>
-        {(user
-          ? ["Submit", "AdminPanel", "Jobs", "Logout"]
-          : ["Login"]
-        ).map((text, index) => (
-          <ListItem
-            button
-            key={text}
-            onClick={text === "Logout" ? logOut : null}
-            component={Link}
-            href={text === "Logout" ? "/" : `/${text.toLowerCase()}`}
-          >
-            <ListItemText primary={text} />
-          </ListItem>
-        ))}
+        {(user ? ["Create", "AdminPanel", "Jobs", "Logout"] : ["Login"]).map(
+          (text, index) => (
+            <ListItem
+              key={text}
+              onClick={text === "Logout" ? logOut : null}
+              component={Link}
+              href={
+                text === "Logout"
+                  ? "/"
+                  : text == "Create"
+                  ? "/createJob"
+                  : `/${text.toLowerCase()}`
+              }
+            >
+              <ListItemText primary={text} />
+            </ListItem>
+          )
+        )}
       </List>
     </Box>
   );
@@ -76,7 +80,7 @@ export default function Navbar() {
               color: "inherit",
               maxWidth: "100px",
               padding: "10px",
-              paddingLeft:0
+              paddingLeft: 0,
             }}
           />
         </Link>
@@ -108,10 +112,10 @@ export default function Navbar() {
                   <Button
                     color="inherit"
                     component={Link}
-                    href="/submit"
+                    href="/createJob"
                     sx={{ margin: 1 }}
                   >
-                    Submit
+                    Create Job
                   </Button>
                   <Button
                     color="inherit"

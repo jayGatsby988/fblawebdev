@@ -2,20 +2,27 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { FaEnvelope, FaLock, FaHome } from "react-icons/fa";
+import { FaEnvelope, FaLock, FaUser, FaHome, FaUserTie } from "react-icons/fa";
 import {
   getAuth,
   GoogleAuthProvider,
   createUserWithEmailAndPassword,
   signInWithPopup,
 } from "firebase/auth";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
 import { redirect, useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/app/context/authcontext";
 
 export default function SignupPage() {
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    role: "Student",
+  });
   const [error, setError] = useState("");
   const auth = getAuth();
+  const db = getFirestore();
   const provider = new GoogleAuthProvider();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -23,31 +30,33 @@ export default function SignupPage() {
   const { user } = useAuth();
 
   if (user) {
-    if (search) {
-      redirect("/" + search || "");
-    } else {
-      redirect("/");
-    }
+    redirect(search ? "/" + search : "/");
   }
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const saveUserToFirestore = async (user) => {
+    await setDoc(doc(db, "users", user.uid), {
+      fullName: formData.fullName,
+      email: formData.email,
+      role: formData.role,
+      uid: user.uid,
+    });
+  };
+
   const handleEmailSignUp = async (e) => {
     e.preventDefault();
     setError("");
     try {
-      await createUserWithEmailAndPassword(
+      const userCredential = await createUserWithEmailAndPassword(
         auth,
         formData.email,
         formData.password
       );
-      if (search) {
-        redirect("/" + search || "");
-      } else {
-        redirect("/");
-      }
+      await saveUserToFirestore(userCredential.user);
+      redirect(search ? "/" + search : "/");
     } catch (error) {
       setError(error.message);
     }
@@ -56,8 +65,9 @@ export default function SignupPage() {
   const handleGoogleSignUp = async () => {
     setError("");
     try {
-      await signInWithPopup(auth, provider);
-      redirect("/" + search || "");
+      const userCredential = await signInWithPopup(auth, provider);
+      await saveUserToFirestore(userCredential.user);
+      redirect(search ? "/" + search : "/");
     } catch (error) {
       setError(error.message);
     }
@@ -69,7 +79,7 @@ export default function SignupPage() {
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-white p-20 rounded-3xl shadow-2xl max-w-lg w-full relative"
+        className="bg-white p-10 rounded-3xl shadow-2xl max-w-lg w-full relative"
       >
         <Link
           href="/"
@@ -77,14 +87,29 @@ export default function SignupPage() {
         >
           <FaHome className="inline mr-2" /> Home
         </Link>
-        <h2 className="text-5xl font-extrabold text-blue-700 text-center mb-6">
+        <h2 className="text-4xl font-extrabold text-blue-700 text-center mb-6">
           Sign Up
         </h2>
         {error && <p className="text-red-600 text-center mb-4">{error}</p>}
-        <form onSubmit={handleEmailSignUp} className="space-y-6">
+        <form onSubmit={handleEmailSignUp} className="space-y-4">
+          <div>
+            <label className="text-gray-700 font-medium">Full Name</label>
+            <div className="flex items-center border border-gray-300 p-3 rounded-lg bg-gray-100">
+              <FaUser className="text-gray-500" />
+              <input
+                type="text"
+                name="fullName"
+                value={formData.fullName}
+                onChange={handleChange}
+                placeholder="John Doe"
+                className="outline-none bg-transparent w-full pl-2"
+                required
+              />
+            </div>
+          </div>
           <div>
             <label className="text-gray-700 font-medium">Email</label>
-            <div className="flex items-center border border-gray-300 p-4 rounded-lg bg-gray-100">
+            <div className="flex items-center border border-gray-300 p-3 rounded-lg bg-gray-100">
               <FaEnvelope className="text-gray-500" />
               <input
                 type="email"
@@ -99,7 +124,7 @@ export default function SignupPage() {
           </div>
           <div>
             <label className="text-gray-700 font-medium">Password</label>
-            <div className="flex items-center border border-gray-300 p-4 rounded-lg bg-gray-100">
+            <div className="flex items-center border border-gray-300 p-3 rounded-lg bg-gray-100">
               <FaLock className="text-gray-500" />
               <input
                 type="password"
@@ -112,30 +137,41 @@ export default function SignupPage() {
               />
             </div>
           </div>
+          <div>
+            <label className="text-gray-700 font-medium">Role</label>
+            <div className="flex items-center border border-gray-300 p-3 rounded-lg bg-gray-100">
+              <FaUserTie className="text-gray-500" />
+              <select
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className="outline-none bg-transparent w-full pl-2"
+              >
+                <option value="Student">Student</option>
+                <option value="Employer">Employer</option>
+                <option value="Counselor">Counselor</option>
+              </select>
+            </div>
+          </div>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             type="submit"
-            className="w-full bg-cyan-900 text-white py-4 rounded-lg font-bold text-xl hover:bg-indigo-700 transition"
+            className="w-full bg-cyan-900 text-white py-3 rounded-lg font-bold text-lg hover:bg-indigo-700 transition"
           >
             Sign Up
           </motion.button>
         </form>
-        <div className="mt-6 text-center">
+        <div className="mt-4 text-center">
           <p className="text-gray-700">Or</p>
           <button
             onClick={handleGoogleSignUp}
             className="w-full flex items-center justify-center bg-white border border-gray-300 p-3 rounded-lg font-semibold shadow-sm hover:bg-gray-100 transition mt-2"
           >
-            <img
-              src="https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/dark/google-color.png"
-              alt="Google"
-              className="w-5 h-5 mr-2"
-            />
             Continue with Google
           </button>
         </div>
-        <p className="text-gray-600 text-center mt-6 text-lg">
+        <p className="text-gray-600 text-center mt-4 text-md">
           Already have an account?{" "}
           <Link
             href="/login"

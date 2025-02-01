@@ -187,7 +187,32 @@ const fillerJobs = [
 
 export default function JobBoard() {
   const { user, logOut } = useAuth();
+  function timeSince(date) {
+    var seconds = Math.floor((new Date() - date) / 1000);
 
+    var interval = Math.floor(seconds / 31536000);
+
+    if (interval > 1) {
+      return interval + " years";
+    }
+    interval = Math.floor(seconds / 2592000);
+    if (interval > 1) {
+      return interval + " months";
+    }
+    interval = Math.floor(seconds / 86400);
+    if (interval > 1) {
+      return interval + " days";
+    }
+    interval = Math.floor(seconds / 3600);
+    if (interval > 1) {
+      return interval + " hours";
+    }
+    interval = Math.floor(seconds / 60);
+    if (interval > 1) {
+      return interval + " minutes";
+    }
+    return Math.floor(seconds) + " seconds";
+  }
   if (!user) {
     redirect("/login?redirect=jobs");
   }
@@ -268,32 +293,36 @@ export default function JobBoard() {
           Job Listings
         </h2>
         <ScrollArea>
-          <div className="space-y-4">
-            {filteredJobs.map((job) => (
-              <motion.div
-                key={job.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className={`p-4 bg-white rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow border-l-4 ${
-                  selectedJob?.id === job.id
-                    ? "border-blue-500 ring-2 ring-blue-300"
-                    : "border-gray-200"
-                }`}
-                onClick={() => setSelectedJob(job)}
-              >
-                <h3 className="text-lg font-semibold">{job.title}</h3>
-                <p className="text-gray-600 flex items-center gap-2">
-                  <FaBuilding /> {job.company}
-                </p>
-                <p className="text-gray-600 flex items-center gap-2">
-                  <FaMapMarkerAlt /> {job.location}
-                </p>
-                <p className="text-gray-600 flex items-center gap-2">
-                  <FaMoneyBillWave /> {job.salary}
-                </p>
-              </motion.div>
-            ))}
+          <div className="space-y-4" style={{maxHeight:'600px'}}>
+            {filteredJobs
+              .filter((job) => job.status == "approved")
+              .map((job) => (
+                <motion.div
+                  key={job.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className={`p-4 bg-white rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow border-l-4 ${
+                    selectedJob?.id === job.id
+                      ? "border-blue-500 ring-2 ring-blue-300"
+                      : "border-gray-200"
+                  }`}
+                  style={{marginRight:'20px'}}
+                  onClick={() => setSelectedJob(job)}
+                >
+                  <h3 className="text-lg font-semibold">{job.title}</h3>
+                  <p className="text-gray-600 flex items-center gap-2">
+                    <FaBuilding /> {job.company}
+                  </p>
+                  <p className="text-gray-600 flex items-center gap-2">
+                    <FaMapMarkerAlt /> {job.location}
+                  </p>
+                  <p className="text-gray-600 flex items-center gap-2">
+                    <FaMoneyBillWave /> {job.salary}
+                  </p>
+                </motion.div>
+              ))}
+              <br/>
           </div>
         </ScrollArea>
       </div>
@@ -332,12 +361,13 @@ export default function JobBoard() {
                 {selectedJob.isRemote ? "Remote Available" : "On-site"}
               </span>
               <span className="flex items-center gap-2 text-gray-500">
-                <FaClock /> {selectedJob.timePosted}
+                <FaClock />{" "}
+                {timeSince(new Date(selectedJob.timePosted)) + " ago"}
               </span>
             </div>
             <button
               className="mt-6 bg-blue-600 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition"
-              onClick={() => redirect("/submit/"+selectedJob.id)}
+              onClick={() => redirect("/submit/" + selectedJob.id)}
             >
               Apply Now
             </button>
