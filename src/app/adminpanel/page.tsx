@@ -91,7 +91,6 @@ const fetchJobPostings = async () => {
       if (data.status != "pending") {
         return;
       }
-      console.log(data);
       return {
         id: doc?.id,
         title: data?.title || "Untitled",

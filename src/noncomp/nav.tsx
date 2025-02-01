@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   useMediaQuery,
   Box,
@@ -17,11 +17,26 @@ import Image from "next/image";
 import Link from "next/link";
 import logoText from "../../public/images/logoPlain.png";
 import { useAuth } from "@/app/context/authcontext";
+import { useParams, usePathname } from "next/navigation";
 
 export default function Navbar() {
   const { user, logOut } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [userRole, setUserRole] = useState(null);
   const isMobile = useMediaQuery("(max-width:600px)");
+  const params = usePathname();
+  // Ensure the user role is updated when the user state changes
+  useEffect(() => {
+    if (user) {
+      const storedUserData = localStorage.getItem("userData");
+      if (storedUserData) {
+        const userData = JSON.parse(storedUserData);
+        setUserRole(userData?.role); // Update role based on stored user data
+      }
+    } else {
+      setUserRole(null); // Set role to null if no user is logged in
+    }
+  }, [user, localStorage.getItem("userData")?.uid, params]); // Re-run effect when `user` state changes
 
   const toggleDrawer = (open) => (event) => {
     if (
@@ -32,21 +47,31 @@ export default function Navbar() {
     }
     setDrawerOpen(open);
   };
-
-  const list = () => (
-    <Box
-      sx={{ width: 250 }}
-      role="presentation"
-      onClick={toggleDrawer(false)}
-      onKeyDown={toggleDrawer(false)}
-    >
-      <List>
-        {(user ? ["Help", "Create", "AdminPanel", "Jobs", "Logout"] : ["Login"]).map(
-          (text) => (
-            <ListItem
-              key={text}
-              onClick={text === "Logout" ? logOut : null}
-            >
+  const list = () => {
+    var array = ["Help"];
+    if (userRole == "Counselor" || userRole == "Employer") {
+      array.push("Create");
+    }
+    if (userRole == "Counselor") {
+      array.push("AdminPanel");
+    }
+    if (userRole) {
+      array.push("Jobs");
+    }
+    array.push("Logout");
+    return (
+      <Box
+        sx={{ width: 250 }}
+        role="presentation"
+        onClick={toggleDrawer(false)}
+        onKeyDown={toggleDrawer(false)}
+      >
+        <List>
+          {(user
+            ? ["Help", "Create", "AdminPanel", "Jobs", "Logout"]
+            : ["Login"]
+          ).map((text) => (
+            <ListItem key={text} onClick={text === "Logout" ? logOut : null}>
               <Link
                 href={
                   text === "Logout"
@@ -57,16 +82,14 @@ export default function Navbar() {
                 }
                 passHref
               >
-                <a style={{ textDecoration: "none", color: "inherit" }}>
-                  <ListItemText primary={text} />
-                </a>
+                <ListItemText primary={text} />
               </Link>
             </ListItem>
-          )
-        )}
-      </List>
-    </Box>
-  );
+          ))}
+        </List>
+      </Box>
+    );
+  };
 
   return (
     <AppBar
@@ -120,21 +143,28 @@ export default function Navbar() {
               >
                 Help
               </Button>
-              <Button
-                color="inherit"
-                component={Link}
-                href="/quick-find"
-                sx={{ margin: 1 }}
-              >
-                Build Resume
-              </Button>
               {user ? (
                 <>
                   <Button
                     color="inherit"
                     component={Link}
+                    href="/quick-find"
+                    sx={{ margin: 1 }}
+                  >
+                    Build Resume
+                  </Button>
+                  <Button
+                    color="inherit"
+                    component={Link}
                     href="/createJob"
                     sx={{ margin: 1 }}
+                    style={{
+                      display: !(
+                        userRole == "Counselor" || userRole == "Employer"
+                      )
+                        ? "none"
+                        : "inherit",
+                    }}
                   >
                     Create Job
                   </Button>
@@ -142,6 +172,9 @@ export default function Navbar() {
                     color="inherit"
                     component={Link}
                     href="/adminpanel"
+                    style={{
+                      display: !(userRole == "Counselor") ? "none" : "inherit",
+                    }}
                     sx={{ margin: 1 }}
                   >
                     AdminPanel
@@ -154,6 +187,15 @@ export default function Navbar() {
                 color="inherit"
                 component={Link}
                 href="/jobs"
+                style={{
+                  display: !(
+                    userRole == "Counselor" ||
+                    userRole == "Student" ||
+                    userRole == "Employer"
+                  )
+                    ? "none"
+                    : "inherit",
+                }}
                 sx={{ margin: 1 }}
               >
                 Listings
@@ -169,7 +211,7 @@ export default function Navbar() {
                   backgroundColor: "rgb(37,99,235)",
                 }}
               >
-                {user ? "Logout" : "Login"}
+                {user || userRole ? "Logout" : "Login"}
               </Button>
             </>
           )}

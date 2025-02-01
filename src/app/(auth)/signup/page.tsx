@@ -9,7 +9,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithPopup,
 } from "firebase/auth";
-import { getFirestore, doc, setDoc } from "firebase/firestore";
+import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 import { redirect, useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/app/context/authcontext";
 
@@ -37,13 +37,35 @@ export default function SignupPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const saveUserToFirestore = async (user) => {
-    await setDoc(doc(db, "users", user.uid), {
-      fullName: formData.fullName,
-      email: formData.email,
-      role: formData.role,
-      uid: user.uid,
-    });
+  const saveAndStoreUser = async (user) => {
+    try {
+      const userRef = doc(db, "users", user.uid);
+
+      // Save user data to Firestore
+      await setDoc(userRef, {
+        fullName: formData.fullName,
+        email: formData.email,
+        role: formData.role,
+        uid: user.uid,
+      });
+
+      // Retrieve user data from Firestore and store it in localStorage
+      const docSnap = await getDoc(userRef);
+      if (docSnap.exists()) {
+        const userData = docSnap.data();
+        const userInfo = {
+          email: user.email,
+          uid: user.uid,
+          role: userData.role,
+        };
+        localStorage.setItem("userData", JSON.stringify(userInfo));
+        console.log(JSON.stringify(userInfo));
+      } else {
+        console.log("No such user document!");
+      }
+    } catch (error) {
+      console.error("Error saving or retrieving user data: ", error);
+    }
   };
 
   const handleEmailSignUp = async (e) => {
@@ -55,7 +77,7 @@ export default function SignupPage() {
         formData.email,
         formData.password
       );
-      await saveUserToFirestore(userCredential.user);
+      await saveAndStoreUser(userCredential.user);
       redirect("/login");
     } catch (error) {
       setError(error.message);
@@ -66,7 +88,7 @@ export default function SignupPage() {
     setError("");
     try {
       const userCredential = await signInWithPopup(auth, provider);
-      await saveUserToFirestore(userCredential.user);
+      await saveAndStoreUser(userCredential.user);
       redirect(search ? "/" + search : "/");
     } catch (error) {
       setError(error.message);

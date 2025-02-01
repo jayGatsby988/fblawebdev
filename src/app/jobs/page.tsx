@@ -222,7 +222,6 @@ export default function JobBoard() {
   }, []);
   const [jobs, setJobs] = useState([]);
   const citiesRef = collection(db, "jobs");
-  console.log(citiesRef);
   useEffect(() => {
     const fetchItems = async () => {
       const querySnapshot = await getDocs(collection(db, "jobs"));
@@ -238,7 +237,6 @@ export default function JobBoard() {
     salaryRange: "",
   });
   const [selectedJob, setSelectedJob] = useState(null);
-  console.log(jobs);
   const filteredJobs = jobs.filter((job) => {
     return (
       job.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
