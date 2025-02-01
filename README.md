@@ -1,6 +1,5 @@
 <h1>CareerConnect</h1>
 <br/>
-<br/>
 Overview
 <br/>
 <br/>
@@ -9,9 +8,13 @@ Overview
 <br/>
 Features
 Next.js for Frontend & API Routes – Fast, scalable, and optimized rendering.
+<br/>
 Firebase Firestore – Real-time database for storing and syncing user data.
+<br/>
 Firebase Authentication – Secure login system for user access control.
+<br/>
 Cloud Functions – Serverless backend logic to handle automated tasks.
+<br/>
 GitHub CI/CD – Streamlined deployment and version control.
 <br/>
 <br/>
