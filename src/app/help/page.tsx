@@ -33,7 +33,7 @@ const faqs = [
   { question: "How do I find a job", answer: "Click the find job listings, and you can see them!" },
   { question: "Can I see for a specific price range?", answer: "You can select a specific salary range in the find job listings!" },
   { question: "How do I post a job?", answer: "You can pos a job, if u sign up to be a employer, and we approve ur job posting." },
-  { question: "How do I update my profile information?", answer: "You can update your profile in the settings section of your account." },
+  { question: "How do I update my application information?", answer: "You can update your application button in that jobs." },
   { question: "What should I do if I find a bug?", answer: "Please report any bugs to our support team through the contact form or email." }
 ];
 

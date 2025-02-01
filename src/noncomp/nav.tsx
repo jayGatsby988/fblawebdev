@@ -120,6 +120,14 @@ export default function Navbar() {
               >
                 Help
               </Button>
+              <Button
+                color="inherit"
+                component={Link}
+                href="/quick-find"
+                sx={{ margin: 1 }}
+              >
+                Build Resume
+              </Button>
               {user ? (
                 <>
                   <Button
