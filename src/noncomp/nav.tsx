@@ -41,7 +41,7 @@ export default function Navbar() {
       onKeyDown={toggleDrawer(false)}
     >
       <List>
-        {(user ? ["Create", "AdminPanel", "Jobs", "Logout"] : ["Login"]).map(
+        {(user ? ["Help", "Create", "AdminPanel", "Jobs", "Logout"] : ["Login"]).map(
           (text, index) => (
             <ListItem
               key={text}
@@ -107,6 +107,14 @@ export default function Navbar() {
             </>
           ) : (
             <>
+              <Button
+                color="inherit"
+                component={Link}
+                href="/help"
+                sx={{ margin: 1 }}
+              >
+                Help
+              </Button>
               {user ? (
                 <>
                   <Button

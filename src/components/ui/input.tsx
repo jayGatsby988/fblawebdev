@@ -1,7 +1,33 @@
+/**
+ * @file Input Component
+ * @author Robel
+ * @description
+ * This file defines a reusable Input component in React.
+ * It supports customization via class names and additional props.
+ *
+ * Features:
+ * - Fully responsive input field with default styles.
+ * - Supports file input styling adjustments.
+ * - Implements accessibility features such as focus-visible styling.
+ * - Allows external class name overrides for further customization.
+ */
+
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Input Component
+ *
+ * A flexible and customizable input field.
+ * Uses `forwardRef` to pass refs to the input element.
+ *
+ * @param {React.ComponentProps<"input">} props - Component properties
+ * @param {string} props.className - Additional CSS classes
+ * @param {string} props.type - Input type (text, password, email, etc.)
+ * @param {React.Ref<HTMLInputElement>} ref - Forwarded ref for the input element
+ * @returns {JSX.Element} A styled input field
+ */
 const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
   ({ className, type, ...props }, ref) => {
     return (
