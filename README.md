@@ -1,3 +1,4 @@
+![he](https://github.com/jayGatsby988/fblawebdev/blob/main/logoPlain.png?raw=true)
 <h1>CareerConnect</h1>
 <h2>Overview</h2>
 <b>Career Connect</b> is an innovative website that provides an efficient job search experience by connecting students with employers. Built with Next.js and Firebase, it offers a seamless user experience with real-time data updates, secure authentication, and fast performance.
