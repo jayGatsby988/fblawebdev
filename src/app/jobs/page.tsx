@@ -213,9 +213,13 @@ export default function JobBoard() {
     }
     return Math.floor(seconds) + " seconds";
   }
-  if (!user) {
-    redirect("/login?redirect=jobs");
-  }
+  useEffect(() => {
+      const storedUserData = localStorage.getItem("userData");
+      if (storedUserData) {
+      } else {
+        redirect("/login?redirect=jobs");
+      }
+    }, []);
   const [jobs, setJobs] = useState([]);
   const citiesRef = collection(db, "jobs");
   console.log(citiesRef);

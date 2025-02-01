@@ -10,6 +10,7 @@ import {
   signInWithPopup,
 } from "firebase/auth";
 import { redirect, useRouter, useSearchParams } from "next/navigation";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { useAuth } from "@/app/context/authcontext";
 
 export default function LoginPage() {
@@ -17,6 +18,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const auth = getAuth();
   const provider = new GoogleAuthProvider();
+  const db = getFirestore(); // Firestore instance
   const router = useRouter();
   const searchParams = useSearchParams();
   const search = searchParams.get("redirect");
@@ -29,9 +31,32 @@ export default function LoginPage() {
       redirect("/");
     }
   }
+
   // Handle input change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // Function to store user data in localStorage
+  const storeUserDataInLocalStorage = async (user) => {
+    try {
+      const userRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(userRef);
+
+      if (docSnap.exists()) {
+        const userData = docSnap.data();
+        const userInfo = {
+          email: user.email,
+          uid: user.uid,
+          role: userData.role, // Retrieve the role from Firestore
+        };
+        localStorage.setItem("userData", JSON.stringify(userInfo));
+      } else {
+        console.log("No such user document!");
+      }
+    } catch (error) {
+      console.error("Error getting user data: ", error);
+    }
   };
 
   // Email & Password Sign In
@@ -39,7 +64,12 @@ export default function LoginPage() {
     e.preventDefault();
     setError(""); // Reset error
     try {
-      await signInWithEmailAndPassword(auth, formData.email, formData.password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
+      await storeUserDataInLocalStorage(userCredential.user); // Store user data in localStorage
       if (search) {
         redirect("/" + search || "");
       } else {
@@ -54,7 +84,8 @@ export default function LoginPage() {
   const handleGoogleSignIn = async () => {
     setError(""); // Reset error
     try {
-      await signInWithPopup(auth, provider);
+      const userCredential = await signInWithPopup(auth, provider);
+      await storeUserDataInLocalStorage(userCredential.user); // Store user data in localStorage
       redirect("/" + search || "");
     } catch (error: any) {
       setError(error.message);

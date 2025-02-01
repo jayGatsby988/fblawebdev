@@ -56,7 +56,7 @@ export default function SignupPage() {
         formData.password
       );
       await saveUserToFirestore(userCredential.user);
-      redirect(search ? "/" + search : "/");
+      redirect("/login");
     } catch (error) {
       setError(error.message);
     }

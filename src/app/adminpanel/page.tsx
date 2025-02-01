@@ -22,8 +22,18 @@ import {
   ResponsiveContainer,
   Bar,
 } from "recharts";
-import { collection, doc, getDocs, updateDoc } from "@firebase/firestore";
+import {
+  collection,
+  doc,
+  Firestore,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+} from "@firebase/firestore";
 import db from "../firebase/firestore";
+import { useAuth } from "../context/authcontext";
+import { redirect } from "next/navigation";
 
 // Dummy implementations of custom UI components
 function Input(props: React.ComponentProps<"input">) {
@@ -81,7 +91,7 @@ const fetchJobPostings = async () => {
       if (data.status != "pending") {
         return;
       }
-      console.log(data)
+      console.log(data);
       return {
         id: doc?.id,
         title: data?.title || "Untitled",
@@ -98,7 +108,38 @@ const fetchJobPostings = async () => {
     return [];
   }
 };
+const fetchUserByUid = async (uid) => {
+  // Check if user data is already in localStorage
+  const cachedUserData = localStorage.getItem("userData");
+  if (cachedUserData) {
+    return JSON.parse(cachedUserData);
+  }
 
+  try {
+    const usersCollection = collection(db, "users");
+    const q = query(usersCollection, where("uid", "==", uid));
+    const querySnapshot = await getDocs(q);
+
+    const userData = querySnapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        fullName: data?.fullName || "No Name",
+        email: data?.email || "No Email",
+        role: data?.role || "No Role",
+        uid: data?.uid || "No UID",
+      };
+    })[0];
+
+    // Cache user data in localStorage
+    localStorage.setItem("userData", JSON.stringify(userData));
+
+    return userData;
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    return null;
+  }
+};
 export default function JobPostingPanel() {
   const [jobPostings, setJobPostings] = useState<JobPosting[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -115,6 +156,18 @@ export default function JobPostingPanel() {
     status: "",
   });
   const { toast } = useToast();
+  const { user } = useAuth();
+
+
+  // Example usage with the UID
+  console.log(user)
+  const uid = user.uid;
+  fetchUserByUid(uid).then((userData) => {
+    console.log(userData);
+      if (userData.role != "Counselor") {
+        redirect("/");
+      }
+  });
 
   // Initialize job postings on the client side
   useEffect(() => {
@@ -128,62 +181,63 @@ export default function JobPostingPanel() {
   }, []);
 
   // Filter job postings by search term (name only) and filters
-const filteredJobPostings = useMemo(() => {
-  const term = debouncedSearch.toLowerCase();
-  return jobPostings
-    .filter((posting) => posting && posting.title) // Ensure posting is defined
-    .filter(
-      (posting) =>
-        posting.title.toLowerCase().includes(term) &&
-        (filters.location ? posting.location === filters.location : true) &&
-        (filters.experience ? posting.experience === filters.experience : true)
-    );
-}, [jobPostings, debouncedSearch, filters]);
+  const filteredJobPostings = useMemo(() => {
+    const term = debouncedSearch.toLowerCase();
+    return jobPostings
+      .filter((posting) => posting && posting.title) // Ensure posting is defined
+      .filter(
+        (posting) =>
+          posting.title.toLowerCase().includes(term) &&
+          (filters.location ? posting.location === filters.location : true) &&
+          (filters.experience
+            ? posting.experience === filters.experience
+            : true)
+      );
+  }, [jobPostings, debouncedSearch, filters]);
 
+  const handleApprove = useCallback(
+    async (id: string) => {
+      try {
+        const jobRef = doc(db, "jobs", id);
+        await updateDoc(jobRef, { status: "approved" });
 
-const handleApprove = useCallback(
-  async (id: string) => {
-    try {
-      const jobRef = doc(db, "jobs", id);
-      await updateDoc(jobRef, { status: "approved" });
+        setJobPostings((prev) => prev.filter((posting) => posting?.id !== id));
+        toast({
+          title: "Approved",
+          description: "Job posting has been approved.",
+        });
+      } catch (error) {
+        console.error("Error approving job:", error);
+        toast({
+          title: "Error",
+          description: "Failed to approve the job.",
+        });
+      }
+    },
+    [toast]
+  );
 
-      setJobPostings((prev) => prev.filter((posting) => posting?.id !== id));
-      toast({
-        title: "Approved",
-        description: "Job posting has been approved.",
-      });
-    } catch (error) {
-      console.error("Error approving job:", error);
-      toast({
-        title: "Error",
-        description: "Failed to approve the job.",
-      });
-    }
-  },
-  [toast]
-);
+  const handleReject = useCallback(
+    async (id: string) => {
+      try {
+        const jobRef = doc(db, "jobs", id);
+        await updateDoc(jobRef, { status: "rejected" });
 
- const handleReject = useCallback(
-   async (id: string) => {
-     try {
-       const jobRef = doc(db, "jobs", id);
-       await updateDoc(jobRef, { status: "rejected" });
-
-       setJobPostings((prev) => prev.filter((posting) => posting?.id !== id));
-       toast({
-         title: "Rejected",
-         description: "Job posting has been rejected.",
-       });
-     } catch (error) {
-       console.error("Error rejecting job:", error);
-       toast({
-         title: "Error",
-         description: "Failed to reject the job.",
-       });
-     }
-   },
-   [toast]
- );
+        setJobPostings((prev) => prev.filter((posting) => posting?.id !== id));
+        toast({
+          title: "Rejected",
+          description: "Job posting has been rejected.",
+        });
+      } catch (error) {
+        console.error("Error rejecting job:", error);
+        toast({
+          title: "Error",
+          description: "Failed to reject the job.",
+        });
+      }
+    },
+    [toast]
+  );
   const handleFilterChange = (key: string, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
