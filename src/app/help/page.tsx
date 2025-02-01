@@ -30,10 +30,10 @@ import Link from "next/link";
 import { FaQuestionCircle, FaEnvelope, FaPhone, FaHome, FaSearch, FaCommentDots } from "react-icons/fa";
 
 const faqs = [
-  { question: "How do I reset my password?", answer: "You can reset your password from the login page by clicking on 'Forgot Password'." },
-  { question: "How can I contact support?", answer: "You can reach us via email at support@example.com or call us at (123) 456-7890." },
-  { question: "Where can I find the user guide?", answer: "The user guide is available in the Help section of your account dashboard." },
-  { question: "How do I update my profile information?", answer: "You can update your profile in the settings section of your account." },
+  { question: "How do I find a job", answer: "Click the find job listings, and you can see them!" },
+  { question: "Can I see for a specific price range?", answer: "You can select a specific salary range in the find job listings!" },
+  { question: "How do I post a job?", answer: "You can pos a job, if u sign up to be a employer, and we approve ur job posting." },
+  { question: "How do I update my application information?", answer: "You can update your application button in that jobs." },
   { question: "What should I do if I find a bug?", answer: "Please report any bugs to our support team through the contact form or email." }
 ];
 
@@ -97,9 +97,7 @@ export default function HelpPage() {
         <div className="mt-6 text-center">
           <h3 className="text-xl font-semibold text-gray-800">Live Chat</h3>
           <p className="text-gray-600">Chat with our support team in real-time.</p>
-          <button className="mt-2 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700">
-            <FaCommentDots /> Start Chat
-          </button>
+      
         </div>
       </motion.div>
     </div>

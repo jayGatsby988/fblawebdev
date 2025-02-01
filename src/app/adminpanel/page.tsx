@@ -320,8 +320,7 @@ export default function JobPostingPanel() {
                   view === "analytics" ? "bg-gray-100" : ""
                 }`}
               >
-                <BarChart className="w-5 h-5 text-gray-700" />
-                <span className="text-sm text-gray-700">Analytics</span>
+         
               </motion.div>
             </nav>
           </div>

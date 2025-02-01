@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   useMediaQuery,
   Box,
@@ -17,28 +17,12 @@ import Image from "next/image";
 import Link from "next/link";
 import logoText from "../../public/images/logoPlain.png";
 import { useAuth } from "@/app/context/authcontext";
-import { usePathname } from "next/navigation";
 
 export default function Navbar() {
   const { user, logOut } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [userRole, setUserRole] = useState(null);
   const isMobile = useMediaQuery("(max-width:600px)");
 
-  const pathname = usePathname();
-  // Ensure the user role is updated when the user state changes
-  useEffect(() => {
-    if (user) {
-      const storedUserData = localStorage.getItem("userData");
-      if (storedUserData) {
-        const userData = JSON.parse(storedUserData);
-        setUserRole(userData?.role); // Update role based on stored user data
-      }
-    } else {
-      setUserRole(null); // Set role to null if no user is logged in
-    }
-  }, [user, pathname]); // Re-run effect when `user` state changes
-  console.log(user);
   const toggleDrawer = (open) => (event) => {
     if (
       event.type === "keydown" &&
@@ -57,35 +41,28 @@ export default function Navbar() {
       onKeyDown={toggleDrawer(false)}
     >
       <List>
-        <ListItem component={Link} href="/help">
-          <ListItemText primary="Help" />
-        </ListItem>
-        {userRole ? (
-          <>
-            {/* Show only if the user is a counselor, employer, or has specific permissions */}
-            {userRole === "Counselor" || userRole === "Employer" ? (
-              <>
-                <ListItem component={Link} href="/createJob">
-                  <ListItemText primary="Create Job" />
-                </ListItem>
-                {userRole === "Counselor" && (
-                  <ListItem component={Link} href="/adminpanel">
-                    <ListItemText primary="Admin Panel" />
-                  </ListItem>
-                )}
-              </>
-            ) : null}
-            <ListItem component={Link} href="/jobs">
-              <ListItemText primary="Jobs" />
+        {(user ? ["Help", "Create", "AdminPanel", "Jobs", "Logout"] : ["Login"]).map(
+          (text) => (
+            <ListItem
+              key={text}
+              onClick={text === "Logout" ? logOut : null}
+            >
+              <Link
+                href={
+                  text === "Logout"
+                    ? "/"
+                    : text === "Create"
+                    ? "/createJob"
+                    : `/${text.toLowerCase()}`
+                }
+                passHref
+              >
+                <a style={{ textDecoration: "none", color: "inherit" }}>
+                  <ListItemText primary={text} />
+                </a>
+              </Link>
             </ListItem>
-            <ListItem onClick={logOut} component={Link} href="/">
-              <ListItemText primary="Logout" />
-            </ListItem>
-          </>
-        ) : (
-          <ListItem component={Link} href="/login">
-            <ListItemText primary="Login" />
-          </ListItem>
+          )
         )}
       </List>
     </Box>
@@ -143,42 +120,44 @@ export default function Navbar() {
               >
                 Help
               </Button>
+              <Button
+                color="inherit"
+                component={Link}
+                href="/quick-find"
+                sx={{ margin: 1 }}
+              >
+                Build Resume
+              </Button>
               {user ? (
                 <>
-                  {/* Show these buttons only for employers and counselors */}
-                  {userRole === "Employer" || userRole === "Counselor" ? (
-                    <Button
-                      color="inherit"
-                      component={Link}
-                      href="/createJob"
-                      sx={{ margin: 1 }}
-                    >
-                      Create Job
-                    </Button>
-                  ) : null}
-
-                  {/* Admin panel only visible for counselors */}
-                  {userRole === "Counselor" && (
-                    <Button
-                      color="inherit"
-                      component={Link}
-                      href="/adminpanel"
-                      sx={{ margin: 1 }}
-                    >
-                      Admin Panel
-                    </Button>
-                  )}
                   <Button
                     color="inherit"
                     component={Link}
-                    href="/jobs"
+                    href="/createJob"
                     sx={{ margin: 1 }}
                   >
-                    Job Listings
+                    Create Job
+                  </Button>
+                  <Button
+                    color="inherit"
+                    component={Link}
+                    href="/adminpanel"
+                    sx={{ margin: 1 }}
+                  >
+                    AdminPanel
                   </Button>
                 </>
-              ) : null}
-
+              ) : (
+                ""
+              )}
+              <Button
+                color="inherit"
+                component={Link}
+                href="/jobs"
+                sx={{ margin: 1 }}
+              >
+                Listings
+              </Button>
               <Button
                 variant="contained"
                 color="primary"
@@ -190,7 +169,7 @@ export default function Navbar() {
                   backgroundColor: "rgb(37,99,235)",
                 }}
               >
-                {userRole ? "Logout" : "Login"}
+                {user ? "Logout" : "Login"}
               </Button>
             </>
           )}
