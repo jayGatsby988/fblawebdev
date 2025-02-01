@@ -161,20 +161,29 @@ export default function JobPostingForm() {
             {currentStep === 2 && (
               <div>
                 <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                  Requirements & Salary
+                  
                 </h2>
+
+                <label>Expirence</label>
                 <input
                   name="experienceRequired"
                   value={jobData.experienceRequired}
                   onChange={handleInputChange}
-                  placeholder="Experience Required"
+                  placeholder="Enter Experience Required"
                   className="w-full px-4 py-3 border rounded-lg mb-4"
                 />
+
+
+                <label >Salary</label>
+
+
+         
                 <input
+                  type = "number"
                   name="salary"
                   value={jobData.salary}
                   onChange={handleInputChange}
-                  placeholder="Salary"
+                  placeholder="Enter Salary"
                   className="w-full px-4 py-3 border rounded-lg mb-4"
                 />
                 <div className="flex items-center space-x-3">

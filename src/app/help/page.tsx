@@ -97,9 +97,7 @@ export default function HelpPage() {
         <div className="mt-6 text-center">
           <h3 className="text-xl font-semibold text-gray-800">Live Chat</h3>
           <p className="text-gray-600">Chat with our support team in real-time.</p>
-          <button className="mt-2 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700">
-            <FaCommentDots /> Start Chat
-          </button>
+      
         </div>
       </motion.div>
     </div>

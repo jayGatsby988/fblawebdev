@@ -217,7 +217,7 @@ export default function JobBoard() {
     const storedUserData = localStorage.getItem("userData");
     if (storedUserData) {
     } else {
-      redirect("/login?redirect=jobs");
+      redirect("/login");
     }
   }, []);
   const [jobs, setJobs] = useState([]);
