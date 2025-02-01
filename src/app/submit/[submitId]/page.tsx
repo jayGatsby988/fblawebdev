@@ -125,26 +125,6 @@ export default function JobApplicationForm() {
   console.log(formData);
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navigation Bar */}
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <div className="text-xl font-bold text-blue-600">CareerConnect</div>
-            <div className="flex space-x-8">
-              <a href="#" className="text-gray-600 hover:text-blue-600">
-                Jobs
-              </a>
-              <a href="#" className="text-gray-600 hover:text-blue-600">
-                Applications
-              </a>
-              <a href="#" className="text-gray-600 hover:text-blue-600">
-                Profile
-              </a>
-            </div>
-          </div>
-        </div>
-      </nav>
-
       <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         {/* Progress Indicator */}
         <div className="mb-12">
@@ -180,7 +160,7 @@ export default function JobApplicationForm() {
                   )}
                 </div>
                 <span
-                  className={`mt-2 text-sm ${
+                  className={`text-center mt-2 text-sm ${
                     currentStep === index + 1
                       ? "text-blue-600 font-medium"
                       : "text-gray-500"
@@ -197,7 +177,7 @@ export default function JobApplicationForm() {
           <div className="bg-white rounded-xl shadow-lg p-8 transition-all duration-300">
             {/* Step 1 */}
             <div className={`space-y-8 ${currentStep !== 1 ? "hidden" : ""}`}>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">
+              <h2 className="text-3xl text-center font-bold text-gray-900 mb-6">
                 Personal Information
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

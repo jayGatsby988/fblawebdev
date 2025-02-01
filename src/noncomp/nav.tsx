@@ -15,7 +15,7 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import Image from "next/image";
 import Link from "next/link";
-import logoText from "../../public/images/logo.png";
+import logoText from "../../public/images/logoPlain.png";
 import { useAuth } from "@/app/context/authcontext";
 
 export default function Navbar() {
@@ -42,7 +42,7 @@ export default function Navbar() {
     >
       <List>
         {(user
-          ? ["Submit", "AdminPanel", "Listings", "Logout"]
+          ? ["Submit", "AdminPanel", "Jobs", "Logout"]
           : ["Login"]
         ).map((text, index) => (
           <ListItem
@@ -74,8 +74,9 @@ export default function Navbar() {
               flexGrow: 1,
               textDecoration: "none",
               color: "inherit",
-              maxWidth: "150px",
+              maxWidth: "100px",
               padding: "10px",
+              paddingLeft:0
             }}
           />
         </Link>
