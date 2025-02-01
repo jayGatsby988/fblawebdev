@@ -57,6 +57,9 @@ export default function Navbar() {
       onKeyDown={toggleDrawer(false)}
     >
       <List>
+        <ListItem component={Link} href="/help">
+          <ListItemText primary="Help" />
+        </ListItem>
         {userRole ? (
           <>
             {/* Show only if the user is a counselor, employer, or has specific permissions */}
