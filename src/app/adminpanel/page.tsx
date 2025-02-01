@@ -147,7 +147,7 @@ const handleApprove = useCallback(
       const jobRef = doc(db, "jobs", id);
       await updateDoc(jobRef, { status: "approved" });
 
-      setJobPostings((prev) => prev.filter((posting) => posting.id !== id));
+      setJobPostings((prev) => prev.filter((posting) => posting?.id !== id));
       toast({
         title: "Approved",
         description: "Job posting has been approved.",
@@ -169,7 +169,7 @@ const handleApprove = useCallback(
        const jobRef = doc(db, "jobs", id);
        await updateDoc(jobRef, { status: "rejected" });
 
-       setJobPostings((prev) => prev.filter((posting) => posting.id !== id));
+       setJobPostings((prev) => prev.filter((posting) => posting?.id !== id));
        toast({
          title: "Rejected",
          description: "Job posting has been rejected.",
