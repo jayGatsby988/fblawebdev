@@ -17,6 +17,7 @@ import Image from "next/image";
 import Link from "next/link";
 import logoText from "../../public/images/logoPlain.png";
 import { useAuth } from "@/app/context/authcontext";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
   const { user, logOut } = useAuth();
@@ -24,6 +25,7 @@ export default function Navbar() {
   const [userRole, setUserRole] = useState(null);
   const isMobile = useMediaQuery("(max-width:600px)");
 
+  const pathname = usePathname();
   // Ensure the user role is updated when the user state changes
   useEffect(() => {
     if (user) {
@@ -35,8 +37,8 @@ export default function Navbar() {
     } else {
       setUserRole(null); // Set role to null if no user is logged in
     }
-  }, [user]); // Re-run effect when `user` state changes
-
+  }, [user, pathname]); // Re-run effect when `user` state changes
+  console.log(user);
   const toggleDrawer = (open) => (event) => {
     if (
       event.type === "keydown" &&

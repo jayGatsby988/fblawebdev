@@ -214,12 +214,12 @@ export default function JobBoard() {
     return Math.floor(seconds) + " seconds";
   }
   useEffect(() => {
-      const storedUserData = localStorage.getItem("userData");
-      if (storedUserData) {
-      } else {
-        redirect("/login?redirect=jobs");
-      }
-    }, []);
+    const storedUserData = localStorage.getItem("userData");
+    if (storedUserData) {
+    } else {
+      redirect("/login?redirect=jobs");
+    }
+  }, []);
   const [jobs, setJobs] = useState([]);
   const citiesRef = collection(db, "jobs");
   console.log(citiesRef);
@@ -297,8 +297,13 @@ export default function JobBoard() {
           Job Listings
         </h2>
         <ScrollArea>
-          <div className="space-y-4" style={{maxHeight:'600px'}}>
+          <div className="space-y-4" style={{ maxHeight: "600px" }}>
             {filteredJobs
+              .sort(function (a, b) {
+                // Turn your strings into dates, and then subtract them
+                // to get a value that is either negative, positive, or zero.
+                return new Date(b.timePosted) - new Date(a.timePosted);
+              })
               .filter((job) => job.status == "approved")
               .map((job) => (
                 <motion.div
@@ -311,7 +316,7 @@ export default function JobBoard() {
                       ? "border-blue-500 ring-2 ring-blue-300"
                       : "border-gray-200"
                   }`}
-                  style={{marginRight:'20px'}}
+                  style={{ marginRight: "20px" }}
                   onClick={() => setSelectedJob(job)}
                 >
                   <h3 className="text-lg font-semibold">{job.title}</h3>
@@ -326,7 +331,7 @@ export default function JobBoard() {
                   </p>
                 </motion.div>
               ))}
-              <br/>
+            <br />
           </div>
         </ScrollArea>
       </div>
